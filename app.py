@@ -3,7 +3,7 @@ import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
-HOST_NAME = 'localhost'
+HOST_NAME = 'http://test-server-myproject.192.168.99.101.nip.io'
 PORT_NUMBER = 8080
 
 
