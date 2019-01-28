@@ -1,6 +1,6 @@
 import time
-import BaseHTTPServer
 import os
+from http.server import BaseHTTPServer
 
 
 HOST_NAME = 'localhost'
