@@ -1,2 +1,5 @@
 PythonHttpServer.iml
 .idea
+filebeat
+filebeat/Dockerfile
+filebeat/entrypoint.sh

@@ -21,6 +21,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         s.wfile.write("<p>HOME: %s</p>" % os.environ['HOME'])
         s.wfile.write("<p>ILYA_MERKUREV_VAR: %s</p>" % os.environ['ILYA_MERKUREV_VAR'])
         s.wfile.write("</body></html>")
+        print time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
 
 if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
