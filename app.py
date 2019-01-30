@@ -1,6 +1,7 @@
 import time
 import BaseHTTPServer
 import os
+import logging
 
 
 HOST_NAME = 'localhost'
@@ -19,9 +20,12 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         s.wfile.write("<html><head><title>Title goes here.</title></head>")
         s.wfile.write("<body><p>This is a test.</p>")
         s.wfile.write("<p>HOME: %s</p>" % os.environ['HOME'])
-        s.wfile.write("<p>ILYA_MERKUREV_VAR: %s</p>" % os.environ['ILYA_MERKUREV_VAR'])
         s.wfile.write("</body></html>")
         print time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        logging.basicConfig(level=logging.INFO)
+        logging.debug("GET DEBUG REQUEST time - %s", time.asctime())
+        logging.info("GET INFO REQUEST time - %s", time.asctime())
+        logging.warning("GET WARNING REQUEST time - %s", time.asctime())
 
 if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
