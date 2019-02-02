@@ -21,7 +21,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         s.wfile.write("<body><p>This is a test.</p>")
         s.wfile.write("<p>HOME: %s</p>" % os.environ['HOME'])
         s.wfile.write("</body></html>")
-        print time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+        print (time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
         logging.basicConfig(level=logging.INFO)
         logging.debug("GET DEBUG REQUEST time - %s", time.asctime())
         logging.info("GET INFO REQUEST time - %s", time.asctime())
@@ -30,7 +30,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 if __name__ == '__main__':
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), MyHandler)
-    print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+    print (time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
