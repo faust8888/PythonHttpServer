@@ -1,14 +1,15 @@
 import time
-import BaseHTTPServer
+# import BaseHTTPServer
 import os
 import logging
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 HOST_NAME = 'localhost'
 PORT_NUMBER = 8007
 
 
-class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class MyHandler(BaseHTTPRequestHandler):
     def do_HEAD(s):
         s.send_response(200)
         s.send_header("Content-type", "text/html")
@@ -28,7 +29,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         logging.warning("GET WARNING REQUEST time - %s", time.asctime())
 
 if __name__ == '__main__':
-    server_class = BaseHTTPServer.HTTPServer
+    server_class = HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), MyHandler)
     print (time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
     try:
