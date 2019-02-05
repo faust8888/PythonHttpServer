@@ -18,18 +18,15 @@ class MyHandler(BaseHTTPRequestHandler):
         s.send_response(200)
         s.send_header("Content-type", "text/html")
         s.end_headers()
-        # s.wfile.write("<html><head><title>Title goes here.</title></head>")
-        # s.wfile.write("<body><p>This is a test.</p>")
-        # s.wfile.write("<p>HOME: %s</p>" % os.environ['HOME'])
-        # s.wfile.write("</body></html>")
+
         print (time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
 
         if os.environ.get('OPENSHIFT_MEF_LOG_PATH') is not None:
             logging.basicConfig(level=logging.INFO)
-            logging.debug("NOOO", time.asctime())
+            logging.info("NOOO", time.asctime())
         else:
             logging.basicConfig(filename=os.environ['OPENSHIFT_MEF_LOG_PATH'] + '/model.log', filemode='a', level=logging.INFO)
-            logging.debug("YEES", time.asctime())
+            logging.info("YEES", time.asctime())
 
         logging.debug("GET DEBUG REQUEST time - %s", time.asctime())
         logging.info("GET INFO REQUEST time - %s", time.asctime())
