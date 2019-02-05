@@ -21,12 +21,12 @@ class MyHandler(BaseHTTPRequestHandler):
 
         print (time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
 
-        if os.environ.get('OPENSHIFT_MEF_LOG_PATH') is not None:
-            logging.basicConfig(level=logging.INFO)
-            logging.info("NOOO", time.asctime())
-        else:
-            logging.basicConfig(filename=os.environ['OPENSHIFT_MEF_LOG_PATH'] + '/model.log', filemode='a', level=logging.INFO)
-            logging.info("YEES", time.asctime())
+        # if os.environ.get('OPENSHIFT_MEF_LOG_PATH') is not None:
+        #     logging.basicConfig(level=logging.INFO)
+        #     logging.info("NOOO", time.asctime())
+        # else:
+        logging.basicConfig(filename=os.environ['OPENSHIFT_MEF_LOG_PATH'] + '/model.log', filemode='a', level=logging.INFO)
+        logging.info("YEES", time.asctime())
 
         logging.debug("GET DEBUG REQUEST time - %s", time.asctime())
         logging.info("GET INFO REQUEST time - %s", time.asctime())
