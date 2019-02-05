@@ -23,7 +23,12 @@ class MyHandler(BaseHTTPRequestHandler):
         # s.wfile.write("<p>HOME: %s</p>" % os.environ['HOME'])
         # s.wfile.write("</body></html>")
         print (time.asctime(), "FileBeat: Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
-        logging.basicConfig(filename='/var/lib/docker/containers/model.log', filemode='a', level=logging.INFO)
+
+        if os.environ.get('OPENSHIFT_MEF_LOG_PATH') is not None:
+            logging.basicConfig(level=logging.INFO)
+        else:
+            logging.basicConfig(filename=os.environ['OPENSHIFT_MEF_LOG_PATH'] + '/model.log', filemode='a', level=logging.INFO)
+
         logging.debug("GET DEBUG REQUEST time - %s", time.asctime())
         logging.info("GET INFO REQUEST time - %s", time.asctime())
         logging.warning("GET WARNING REQUEST time - %s", time.asctime())
