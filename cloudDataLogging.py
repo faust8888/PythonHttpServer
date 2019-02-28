@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch
 import json
 import uuid
 import socket
+import os
 
 ES_METRICS_TYPE = 'mef_model_metrics_type'
 ES_INDEX_PREFIX = 'spr-mef-'

@@ -51,7 +51,7 @@
            "name": "${APPLICATION_NAME}"           
          },
          "data": {
-           "mef_application_name": "${APPLICATION_NAME}"
+           "mef_application_name": "${APPLICATION_NAME}",
            "mef_project_name": "${PROJECT_NAME}",
            "mef_es_hosts": "${OPENSHIFT_ES_HOSTS}",
            "mef_es_port": "9200"
