@@ -43,7 +43,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     server_class = HTTPServer
-    httpd = server_class((HOST_OS, PORT_NUMBER), MyHandler)
+    httpd = server_class((HOST_NAME, PORT_NUMBER), MyHandler)
     print (time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
     try:
         httpd.serve_forever()
