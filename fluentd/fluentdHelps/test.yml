@@ -1,0 +1,44 @@
+                     {
+                        "name": "${APPLICATION_NAME}",
+                        "image": "${APPLICATION_NAME}",
+                        "ports": [
+                           {
+                              "name": "mef-model-http",
+                              "containerPort": 8080,
+                              "protocol": "TCP"
+                           }
+                        ],
+                        "volumeMounts": [
+                            {
+                               "name": "app-logs",
+                               "mountPath": "${OPENSHIFT_MEF_LOG_PATH}"
+                            }
+                        ],
+                        "env": [
+                          {
+                            "name": "OPENSHIFT_MEF_LOG_PATH",
+                            "valueFrom": {
+                              "configMapKeyRef": {
+                                "name": "${APPLICATION_NAME}",
+                                "key": "openshift_mef_log_path"
+                              }
+                            }
+                          }
+                        ],
+                        "resources": {
+                            "limits": {
+                               "cpu": "400m",
+                               "memory": "1000Mi"
+                            },
+                            "requests": {
+                               "cpu": "400m",
+                               "memory": "512Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "imagePullPolicy": "Always",
+                        "securityContext": {
+                           "capabilities": {},
+                           "privileged": false
+                        }
+                     },

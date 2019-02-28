@@ -1,0 +1,327 @@
+{
+   "kind": "Template",
+   "apiVersion": "v1",
+   "metadata": {
+      "name": "mef-model",
+      "annotations": {
+         "description": "Шаблон включает в себя необходимые ресурсы для запуска исполняемой модели на языках Java, Scala, Python."
+      }
+   },
+   "labels": {
+      "application": "mef-model",
+      "createdBy": "template-mef-model"
+   },
+   "parameters": [
+      {
+         "description": "Имя проекта.",
+         "name": "PROJECT_NAME",
+         "value": "myproject"
+      },
+      {
+         "description": "Имя исполняемой модели.",
+         "name": "APPLICATION_NAME",
+         "value": "mef-model"
+      },
+      {
+         "description": "Ссылка на git репозиторий.",
+         "name": "OPENSHIFT_BUILD_SOURCE",
+         "value": "https://github.com/faust8888/PythonHttpServer.git"
+      },
+      {
+         "description": "Ветка проекта.",
+         "name": "OPENSHIFT_BUILD_BRANCH",
+         "value": "master"
+      },
+      {
+         "description": "S2I (java:8, python:3.6)",
+         "name": "OPENSHIFT_S2I",
+         "value": "python:3.6"
+      },
+      {
+          "description": "Сервера Elasticsearch",
+          "name": "OPENSHIFT_ES_HOSTS",
+          "value": "10.116.150.162:5044"
+      }
+   ],
+   "objects": [
+      {
+         "kind": "ConfigMap",
+         "apiVersion": "v1",
+         "metadata": {
+           "name": "${APPLICATION_NAME}"           
+         },
+         "data": {
+           "mef_application_name": "${APPLICATION_NAME}"
+           "mef_project_name": "${PROJECT_NAME}",
+           "mef_es_hosts": "${OPENSHIFT_ES_HOSTS}",
+           "mef_es_port": "9200"
+         }
+      },
+      {
+         "kind": "BuildConfig",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}"
+         },
+         "spec": {
+            "triggers": [
+               {
+                  "type": "ImageChange",
+                  "imageChange": {}
+               }
+            ],
+            "resources": {
+               "limits": {
+                  "cpu": "400m",
+                  "memory": "1000Mi"
+               },
+               "requests": {
+                  "cpu": "400m",
+                  "memory": "512Mi"
+               }
+            },
+            "source": {
+               "type": "Git",
+               "git": {
+                  "uri": "${OPENSHIFT_BUILD_SOURCE}",
+                  "ref": "${OPENSHIFT_BUILD_BRANCH}"
+               }
+            },
+            "strategy": {
+               "type": "Source",
+               "sourceStrategy": {
+                  "from": {
+                     "kind": "ImageStreamTag",
+                     "namespace": "openshift",
+                     "name": "${OPENSHIFT_S2I}"
+                  },
+                  "env": [
+                     {
+                        "name": "OPENSHIFT_BUILD_SOURCE",
+                        "value": "${OPENSHIFT_BUILD_SOURCE}"
+                     },
+                     {
+                        "name": "HOME",
+                        "value": "/opt/app-root/src"
+                     },
+                     {
+                         "name": "APP_ROOT",
+                         "value": "/opt/app-root"
+                     },
+                     {
+                         "name": "MAVEN_ARGS",
+                         "value": "-DskipTests clean package"
+                     }
+                  ]
+               }
+            },
+            "output": {
+               "to": {
+                  "kind": "ImageStreamTag",
+                  "name": "${APPLICATION_NAME}:latest"
+               }
+            }
+         }
+      },
+      {
+         "kind": "ImageStream",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}"
+         },
+         "spec": {
+            "dockerImageRepository": "",
+            "tags": [
+               {
+                  "name": "latest"
+               }
+            ]
+         }
+      },
+      {
+         "kind": "DeploymentConfig",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}",
+            "labels": {
+               "deploymentConfig": "${APPLICATION_NAME}"
+            }
+         },
+         "spec": {
+            "strategy": {
+               "type": "Recreate"
+            },
+            "triggers": [
+               {
+                  "type": "ImageChange",
+                  "imageChangeParams": {
+                     "automatic": true,
+                     "containerNames": [
+                        "${APPLICATION_NAME}"
+                     ],
+                     "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "${APPLICATION_NAME}:latest"
+                     }
+                  }
+               },
+               {
+                  "type": "ConfigChange"
+               }
+            ],
+            "replicas": 1,
+            "selector": {
+               "deploymentConfig": "${APPLICATION_NAME}"
+            },
+            "template": {
+               "metadata": {
+                  "labels": {
+                     "deploymentConfig": "${APPLICATION_NAME}"
+                  }
+               },
+               "spec": {
+                  "containers": [
+                     {
+                        "name": "${APPLICATION_NAME}",
+                        "image": "${APPLICATION_NAME}",
+                        "ports": [
+                           {
+                              "name": "mef-model-http",
+                              "containerPort": 8080,
+                              "protocol": "TCP"
+                           }
+                        ],
+                        "env": [
+                          {
+                            "name": "MEF_APPLICATION_NAME",
+                            "valueFrom": {
+                              "configMapKeyRef": {
+                                 "name": "${APPLICATION_NAME}",
+                                 "key": "mef_application_name"
+                               }
+                             }
+                           },
+                           {
+                              "name": "MEF_PROJECT_NAME",
+                              "valueFrom": {
+                                 "configMapKeyRef": {
+                                    "name": "${APPLICATION_NAME}",
+                                    "key": "mef_project_name"
+                                 }
+                              }
+                           },
+                           {
+                              "name": "MEF_ES_HOSTS",
+                              "valueFrom": {
+                                 "configMapKeyRef": {
+                                    "name": "${APPLICATION_NAME}",
+                                    "key": "mef_es_hosts"
+                                 }
+                              }
+                           },
+                           {
+                              "name": "MEF_ES_PORT",
+                              "valueFrom": {
+                                 "configMapKeyRef": {
+                                    "name": "${APPLICATION_NAME}",
+                                    "key": "mef_es_port"
+                                 }
+                              }
+                           }
+                        ],
+                        "resources": {
+                            "limits": {
+                               "cpu": "400m",
+                               "memory": "1000Mi"
+                            },
+                            "requests": {
+                               "cpu": "400m",
+                               "memory": "512Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "imagePullPolicy": "Always",
+                        "securityContext": {
+                           "capabilities": {},
+                           "privileged": false
+                        }
+                     }
+                  ],
+                  "restartPolicy": "Always",
+                  "dnsPolicy": "ClusterFirst"
+               }
+            }
+         }
+      },
+      {
+         "kind": "Route",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}",
+            "annotations": {
+               "description": "Route for application's http service"
+            }
+         },
+         "spec": {
+            "host": "${APPLICATION_NAME}.${PROJECT_NAME}.apps.test-ose.ca.sbrf.ru",
+            "port": {
+               "targetPort": "8080-tcp"
+            },
+            "to": {
+               "kind": "Service",
+               "name": "${APPLICATION_NAME}"
+            }
+         }
+      },
+      {
+         "kind": "Service",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}",
+            "annotations": {
+               "description": "The web server's http port"
+            }
+         },
+         "spec": {
+            "ports": [
+               {
+                  "name": "8080-tcp",
+                  "protocol": "TCP",
+                  "port": 8080,
+                  "targetPort": 8080
+               }
+            ],
+            "sessionAffinity": "None",
+            "type": "ClusterIP",
+            "selector": {
+               "deploymentConfig": "${APPLICATION_NAME}"
+            }
+         },
+         "status": {
+            "loadBalancer": {}
+         }
+      },
+      {
+         "kind": "Service",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}-fluentd"
+         },
+         "spec": {
+            "ports": [
+               {
+                 "protocol": "TCP",
+                 "port": "5044",
+                 "targetPort": 5044,
+                 "name": "http"
+               }
+            ],
+            "sessionAffinity": "None",
+            "type": "ClusterIP"
+         },
+         "status": {
+            "loadBalancer": {}
+         }
+      }
+   ]
+}
