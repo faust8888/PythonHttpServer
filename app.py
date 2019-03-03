@@ -44,7 +44,16 @@ class MyHandler(BaseHTTPRequestHandler):
 
         # logger = logging.getLogger('CloudDataLogging')
 
-        logging.info("GET INFO REQUEST time")
+        root = logging.getLogger()
+        root.setLevel(logging.INFO)
+
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        root.addHandler(handler)
+
+        root.info("GET INFO REQUEST time")
 
 if __name__ == '__main__':
     server_class = HTTPServer
