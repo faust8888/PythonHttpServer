@@ -41,6 +41,11 @@
           "description": "Сервера Elasticsearch",
           "name": "OPENSHIFT_ES_HOSTS",
           "value": "10.116.150.162:5044"
+      },
+      {
+           "description": "Docker образ Fluentd.",
+           "name": "OPENSHIFT_DOCKER_IMAGE_FLUENTD",
+           "value": "faust8888/myfluentd:1.0"
       }
    ],
    "objects": [
@@ -54,7 +59,8 @@
            "mef_application_name": "${APPLICATION_NAME}",
            "mef_project_name": "${PROJECT_NAME}",
            "mef_es_hosts": "${OPENSHIFT_ES_HOSTS}",
-           "mef_es_port": "9200"
+           "mef_es_port": "9200",
+           "fluentd_logging_path": "console"
          }
       },
       {
@@ -244,11 +250,52 @@
                         "securityContext": {
                            "capabilities": {},
                            "privileged": false
+                        },
+                        "volumeMounts": [
+                          {
+                            "name": "varlog",
+                            "mountPath": "/var/log"
+                          }
+                        ]
+                     },
+                     {
+                        "name": "${APPLICATION_NAME}-fluentd",
+                        "image": "${OPENSHIFT_DOCKER_IMAGE_FLUENTD}",
+                        "ports": [
+                            {
+                               "name": "fluentd",
+                               "containerPort": 24224,
+                               "protocol": "TCP"
+                            }
+                        ],
+                        "env": [
+                           {
+                               "name": "LOGGING_FILE_PATH",
+                               "valueFrom": {
+                                  "configMapKeyRef": {
+                                     "name": "${APPLICATION_NAME}",
+                                     "key": "fluentd_logging_path"
+                                  }
+                               }
+                            }
+                        ],
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "imagePullPolicy": "Always",
+                        "securityContext": {
+                           "capabilities": {},
+                           "privileged": false
                         }
                      }
                   ],
                   "restartPolicy": "Always",
-                  "dnsPolicy": "ClusterFirst"
+                  "dnsPolicy": "ClusterFirst",
+                  "volumes": [
+                    {
+                      "name": "varlog",
+                      "emptyDir": {}
+                    }
+                  ]
                }
             }
          }
